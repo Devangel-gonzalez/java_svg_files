@@ -70,6 +70,7 @@ public class TagsHandler  extends DefaultHandler {
             currentShape.put("x2", atts.getValue("x2"));
             currentShape.put("y2", atts.getValue("y2"));
             currentShape.put("stroke", atts.getValue("stroke"));
+            currentShape.put("stroke-width", atts.getValue("stroke-width"));
             shapes.add(currentShape);
         }
 
