@@ -15,8 +15,6 @@ public class DescribeSVG {
             System.exit(1);
         }
 
-
-
         // Configurar factory para crear un parser SAX
         SAXParserFactory factory = SAXParserFactory.newInstance();
         factory.setNamespaceAware(true);
