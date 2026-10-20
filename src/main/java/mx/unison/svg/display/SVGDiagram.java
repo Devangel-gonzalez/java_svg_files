@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 public class SVGDiagram extends JComponent {
 
-    public static final Logger LOG = Logger.getLogger( SVGDiagram.class.getName() );
+    public static final Logger LOG = Logger.getLogger(SVGDiagram.class.getName());
 
     private SAXParser parser = null;
 
@@ -29,7 +29,6 @@ public class SVGDiagram extends JComponent {
     private BasicStroke currentStroke;
 
 
-
     private ArrayList<Properties> shapes = null;
     private Properties currentShape = null;
 
@@ -39,7 +38,7 @@ public class SVGDiagram extends JComponent {
     }
 
 
-    public SVGDiagram(File file ) {
+    public SVGDiagram(File file) {
         super();
         SAXParserFactory factory = SAXParserFactory.newInstance();
         factory.setNamespaceAware(true);
@@ -67,7 +66,7 @@ public class SVGDiagram extends JComponent {
                 }
             });
         } catch (Exception e) {
-            LOG.severe("Error parsing SVG file: " + e.getMessage());
+            LOG.severe("Error getting SVG dimensions: " + e.getMessage());
         }
 
         shapes = new ArrayList<>();
@@ -76,10 +75,13 @@ public class SVGDiagram extends JComponent {
         currentStroke = new BasicStroke(1.0f);
 
         TagsHandler tagsHandler = new TagsHandler();
+
         try {
+            parser.reset();
             parser.parse(file, tagsHandler);
         } catch (Exception e) {
-            LOG.severe("Error parsing SVG file: " + e.getMessage());
+            LOG.severe("Error in SVG file: " + e.getMessage());
+            e.printStackTrace();
         }
         shapes = tagsHandler.getShapes();
     }
@@ -91,11 +93,12 @@ public class SVGDiagram extends JComponent {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(strokeColor);
 
-        for(Properties shape : shapes) {
+        for (Properties shape : shapes) {
             String type = shape.getProperty("type");
 
-            if(type==null) continue;
-            if( type.equals("line") ) {
+            if (type == null)
+                continue;
+            if (type.equals("line")) {
                 String x1Str = shape.getProperty("x1");
                 String y1Str = shape.getProperty("y1");
                 String x2Str = shape.getProperty("x2");
@@ -103,7 +106,7 @@ public class SVGDiagram extends JComponent {
                 String stroke = shape.getProperty("stroke");
                 String strokeWidthStr = shape.getProperty("stroke-width");
 
-                if(strokeWidthStr != null) {
+                if (strokeWidthStr != null) {
                     try {
                         float strokeWidth = Float.parseFloat(strokeWidthStr);
                         currentStroke = new BasicStroke(strokeWidth);
@@ -138,23 +141,60 @@ public class SVGDiagram extends JComponent {
                 }
 
             }
-            if(type.equals("circle") ) {
+            if (type.equals("circle")) {
                 String cx = shape.getProperty("cx");
                 String cy = shape.getProperty("cy");
-                String radio = shape.getProperty("radio");
+                String radio = shape.getProperty("r");
                 String fill = shape.getProperty("fill");
-                //String stroke = shape.getProperty("stroke");
-                //String strokeWidthStr = shape.getProperty("stroke-width");
+                String stroke = shape.getProperty("stroke");
+                String strokeWidthStr = shape.getProperty("stroke-width");
 
-                int centroX =  Integer.parseInt(cx);
-                int centroY = Integer.parseInt(cy);
-                int radius = Integer.parseInt(radio);
+                if (cx != null && cy != null && radio != null) {
+                    int centroX = Integer.parseInt(cx);
+                    int centroY = Integer.parseInt(cy);
+                    int radius = Integer.parseInt(radio);
 
-                g2d.setColor(fillColor);
-                g2d.fillOval(centroX - radius, centroY-radius
-                        , radius, radius);
+                    if (fill != null) {
+                        try {
+                            fillColor = Color.decode(fill);
+                        } catch (NumberFormatException e) {
+                            LOG.warning("Invalid stroke color: " + fill);
+                            fillColor = parseColor(fill);
+                        }
+                        g2d.setColor(fillColor);
+                        g2d.fillOval(centroX - radius, centroY - radius
+                                , radius * 2, radius * 2);
+                    }
+                    if (stroke != null) {
+                        strokeColor = null;
+
+                        try {
+                            strokeColor = Color.decode(stroke);
+                        } catch (NumberFormatException e) {
+                            LOG.warning("Invalid stroke color: " + stroke);
+                            strokeColor = parseColor(stroke);
+                        }
+                        g2d.setColor(strokeColor);
+
+                    }
+
+                    if (strokeWidthStr != null) {
+                        try {
+                            float strokeWidth = Float.parseFloat(strokeWidthStr);
+                            currentStroke = new BasicStroke(strokeWidth);
+                            g2d.setStroke(currentStroke);
+                        } catch (NumberFormatException e) {
+                            LOG.warning("Invalid stroke width: " + strokeWidthStr);
+                            currentStroke = new BasicStroke(1.0f);
+                            g2d.setStroke(currentStroke);
+                        }
+                    }
+                    g2d.drawOval(centroX - radius,
+                            centroY - radius,
+                            radius * 2, radius * 2);
 
 
+                }
             }
 
         }

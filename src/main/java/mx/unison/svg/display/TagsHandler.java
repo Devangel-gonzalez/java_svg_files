@@ -3,17 +3,19 @@ package mx.unison.svg.display;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TagsHandler  extends DefaultHandler {
     public static final Logger LOG = Logger.getLogger( TagsHandler.class.getName() );
 
 
-    private ArrayList<Properties> shapes = null;
+    private ArrayList<Properties> shapes;
     private Properties currentShape = null;
 
     public TagsHandler() {
@@ -65,12 +67,8 @@ public class TagsHandler  extends DefaultHandler {
             LOG.info("Starting element " + tagName);
             currentShape = new Properties();
             currentShape.put("type", "line");
-            currentShape.put("x1", atts.getValue("x1"));
-            currentShape.put("y1", atts.getValue("y1"));
-            currentShape.put("x2", atts.getValue("x2"));
-            currentShape.put("y2", atts.getValue("y2"));
-            currentShape.put("stroke", atts.getValue("stroke"));
-            currentShape.put("stroke-width", atts.getValue("stroke-width"));
+
+            copyAttributes(atts, currentShape);
             shapes.add(currentShape);
         }
 
@@ -78,14 +76,22 @@ public class TagsHandler  extends DefaultHandler {
             LOG.info("Starting element " + tagName);
             currentShape = new Properties();
             currentShape.put("type", "circle");
-            currentShape.put("cx", atts.getValue("cx"));
-            currentShape.put("cy", atts.getValue("cy"));
-            currentShape.put("r", atts.getValue("r"));
-            currentShape.put("fill", atts.getValue("fill"));
-            shapes.add(currentShape);
 
+            copyAttributes(atts, currentShape);
+            shapes.add(currentShape);
         }
 
+    }
+
+
+    private void copyAttributes(Attributes atts, Properties myShape) {
+        if(atts.getLength() != 0) {
+            for(int i = 0; i < atts.getLength(); i++) {
+                String name = atts.getLocalName(i);
+                String value = atts.getValue(i);
+                myShape.put(name, value);
+            }
+        }
     }
 
     @Override
@@ -99,17 +105,7 @@ public class TagsHandler  extends DefaultHandler {
     }
 
     @Override
-    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
-
-    }
-
-    @Override
-    public void processingInstruction(String target, String data) throws SAXException {
-
-    }
-
-    @Override
-    public void skippedEntity(String name) throws SAXException {
-
+    public void error(SAXParseException e) throws SAXException {
+        LOG.log(Level.SEVERE, "OOPS" + e.getMessage());
     }
 }

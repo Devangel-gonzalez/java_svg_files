@@ -3,6 +3,7 @@ package mx.unison.svg.display;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.nio.file.Path;
 
 public class DisplayDiagram {
     public static void main(String[] args) {
@@ -12,6 +13,10 @@ public class DisplayDiagram {
         }
 
         File file = new File(args[0]);
+
+        Path path = Path.of( args[0] );
+        path = path.toAbsolutePath();
+        System.out.println(path.toString());
 
         JFrame frame = new JFrame("Dibujo");
 
