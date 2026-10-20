@@ -138,6 +138,24 @@ public class SVGDiagram extends JComponent {
                 }
 
             }
+            if(type.equals("circle") ) {
+                String cx = shape.getProperty("cx");
+                String cy = shape.getProperty("cy");
+                String radio = shape.getProperty("radio");
+                String fill = shape.getProperty("fill");
+                //String stroke = shape.getProperty("stroke");
+                //String strokeWidthStr = shape.getProperty("stroke-width");
+
+                int centroX =  Integer.parseInt(cx);
+                int centroY = Integer.parseInt(cy);
+                int radius = Integer.parseInt(radio);
+
+                g2d.setColor(fillColor);
+                g2d.fillOval(centroX - radius, centroY-radius
+                        , radius, radius);
+
+
+            }
 
         }
 

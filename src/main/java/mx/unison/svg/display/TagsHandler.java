@@ -74,6 +74,18 @@ public class TagsHandler  extends DefaultHandler {
             shapes.add(currentShape);
         }
 
+        if  (tagName.equals("circle") ) {
+            LOG.info("Starting element " + tagName);
+            currentShape = new Properties();
+            currentShape.put("type", "circle");
+            currentShape.put("cx", atts.getValue("cx"));
+            currentShape.put("cy", atts.getValue("cy"));
+            currentShape.put("r", atts.getValue("r"));
+            currentShape.put("fill", atts.getValue("fill"));
+            shapes.add(currentShape);
+
+        }
+
     }
 
     @Override
