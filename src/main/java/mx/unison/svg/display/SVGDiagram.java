@@ -11,6 +11,8 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.awt.*;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -24,11 +26,14 @@ public class SVGDiagram extends JComponent {
     private int svgW; // ancho del dibujo
     private int svgH;  // alto del dibujo
 
+    private Properties webColors;
+
+    // parametros iniciales par dibujar las figuras
     private Color strokeColor;
     private Color fillColor;
     private BasicStroke currentStroke;
 
-
+    // propiedades de las figuras leidas del archivo SVG
     private ArrayList<Properties> shapes = null;
     private Properties currentShape = null;
 
@@ -84,6 +89,8 @@ public class SVGDiagram extends JComponent {
             e.printStackTrace();
         }
         shapes = tagsHandler.getShapes();
+        // Cargar los colores web desde el archivo colors.properties
+        loadColors();
     }
 
     @Override
@@ -131,7 +138,8 @@ public class SVGDiagram extends JComponent {
                             strokeColor = Color.decode(stroke);
                         } catch (NumberFormatException e) {
                             LOG.warning("Invalid stroke color: " + stroke);
-                            strokeColor = parseColor(stroke);
+                            //strokeColor = parseColor(stroke);
+                            g2d.setColor( parseColor(stroke, 1.0f) );
                         }
                         g2d.setColor(strokeColor);
                     } else {
@@ -159,7 +167,7 @@ public class SVGDiagram extends JComponent {
                             fillColor = Color.decode(fill);
                         } catch (NumberFormatException e) {
                             LOG.warning("Invalid stroke color: " + fill);
-                            fillColor = parseColor(fill);
+                            fillColor = parseColor(fill,1.0f);
                         }
                         g2d.setColor(fillColor);
                         g2d.fillOval(centroX - radius, centroY - radius
@@ -175,7 +183,8 @@ public class SVGDiagram extends JComponent {
                             strokeColor = parseColor(stroke);
                         }
                         g2d.setColor(strokeColor);
-
+                    } else {
+                        g2d.setColor(fillColor);
                     }
 
                     if (strokeWidthStr != null) {
@@ -193,13 +202,74 @@ public class SVGDiagram extends JComponent {
                             centroY - radius,
                             radius * 2, radius * 2);
 
-
                 }
             }
 
         }
 
     }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/named-color
+    private void loadColors() {
+        try {
+            String userDir = System.getProperty("user.dir");
+            FileReader reader = new FileReader(userDir + "/colors.properties");
+            webColors = new Properties();
+            webColors.load(reader);
+            //System.out.println(webColors.size() + " " + webColors.getProperty("maroon"));
+        } catch (IOException ex) {
+            LOG.severe(ex.getMessage());
+        }
+    }
+
+    // Metodo para parsear un color desde un string, considerando el formato hexadecimal, rgb o nombre de color
+    private Color parseColor(String colorString, float opacity) {
+        String colorCode = colorString.toLowerCase();
+        Color newColor = null;
+
+        //System.out.println("param " + colorCode);
+        if (colorCode.startsWith("#")) {
+            // Codigo de color "#00ffff"
+            colorCode = colorCode.substring(1);
+        } else if (colorCode.startsWith("0x")) {
+            colorCode = colorCode.substring(2);
+        } else if (colorCode.startsWith("rgb")) {
+            // Codigo de color "rgb(00,255,0)"
+            if (colorCode.startsWith("(", 3)) {
+                return Color.BLACK;
+            } else if (colorCode.startsWith("a(", 3)) {
+                return Color.BLACK;
+            }
+        } else {
+            // nombre de color e.g. "red
+            //Color namedColor = Color.getColor(colorString);
+            colorCode = webColors.getProperty(colorCode).substring(1).trim();
+        }
+        try {
+            int r;
+            int g;
+            int b;
+            int a;
+            int len = colorCode.length();
+
+            if (len == 6) {
+                //System.out.println(colorCode);
+                r = Integer.parseInt(colorCode.substring(0, 2), 16);
+                g = Integer.parseInt(colorCode.substring(2, 4), 16);
+                b = Integer.parseInt(colorCode.substring(4, 6), 16);
+                //System.out.println(r + "," + g + "," + b);
+              // newColor = new Color(r, g, b, opacity);
+                newColor = new Color(r, g, b);
+            }
+
+        } catch (NumberFormatException nfe) {
+           LOG.warning("Invalid color format: " + nfe.getMessage() );
+           newColor = Color.BLACK;
+        }
+        return newColor;
+    }
+
+
 
     private Color parseColor(String colorStr) {
         Color color = null;

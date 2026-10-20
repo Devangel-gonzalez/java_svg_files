@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 public class TagsHandler  extends DefaultHandler {
     public static final Logger LOG = Logger.getLogger( TagsHandler.class.getName() );
 
-
     private ArrayList<Properties> shapes;
     private Properties currentShape = null;
 
@@ -26,7 +25,6 @@ public class TagsHandler  extends DefaultHandler {
     public ArrayList<Properties> getShapes() {
         return shapes;
     }
-
 
     @Override
     public void setDocumentLocator(Locator locator) {
@@ -82,7 +80,6 @@ public class TagsHandler  extends DefaultHandler {
         }
 
     }
-
 
     private void copyAttributes(Attributes atts, Properties myShape) {
         if(atts.getLength() != 0) {

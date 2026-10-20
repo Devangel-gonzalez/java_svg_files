@@ -18,13 +18,19 @@ public class DisplayDiagram {
         path = path.toAbsolutePath();
         System.out.println(path.toString());
 
-        JFrame frame = new JFrame("Dibujo");
 
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new SVGDiagram(file));
-        frame.setResizable(false);
-        frame.pack();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JFrame frame = new JFrame("SVG Diagram Viewer");
+
+                frame.setVisible(true);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.add(new SVGDiagram(file));
+                frame.setResizable(false);
+                frame.pack();
+            }
+        });
 
     }
 }
