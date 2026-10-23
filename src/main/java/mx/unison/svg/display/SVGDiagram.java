@@ -333,6 +333,103 @@ public class SVGDiagram extends JComponent {
                 }
             }
 
+            // Dibujar una elipse
+            if (type.equals("ellipse")) {
+                String cxStr = shape.getProperty("cx");
+                String cyStr = shape.getProperty("cy");
+                String rxStr = shape.getProperty("rx");
+                String ryStr = shape.getProperty("ry");
+                String fill = shape.getProperty("fill");
+                String stroke = shape.getProperty("stroke");
+                String strokeWidthStr = shape.getProperty("stroke-width");
+
+                if (cxStr != null && cyStr != null && rxStr != null && ryStr != null) {
+                    int cx = (int) Double.parseDouble(cxStr);
+                    int cy = (int) Double.parseDouble(cyStr);
+                    int rx = (int) Double.parseDouble(rxStr);
+                    int ry = (int) Double.parseDouble(ryStr);
+
+                    // Grosor del trazo
+                    if (strokeWidthStr != null) {
+                        try {
+                            float strokeWidth = Float.parseFloat(strokeWidthStr);
+                            currentStroke = new BasicStroke(strokeWidth);
+                            g2d.setStroke(currentStroke);
+                        } catch (NumberFormatException e) {
+                            currentStroke = new BasicStroke(1.0f);
+                            g2d.setStroke(currentStroke);
+                        }
+                    }
+
+                    // Relleno
+                    if (fill != null && !fill.equalsIgnoreCase("none")) {
+                        try {
+                            fillColor = Color.decode(fill);
+                        } catch (NumberFormatException e) {
+                            fillColor = parseColor(fill, 1.0f);
+                        }
+                        g2d.setColor(fillColor);
+                        g2d.fillOval(cx - rx, cy - ry, rx * 2, ry * 2);
+                    }
+
+                    // Contorno
+                    if (stroke != null) {
+                        try {
+                            strokeColor = Color.decode(stroke);
+                        } catch (NumberFormatException e) {
+                            strokeColor = parseColor(stroke, 1.0f);
+                        }
+                        g2d.setColor(strokeColor);
+                    }
+
+                    g2d.drawOval(cx - rx, cy - ry, rx * 2, ry * 2);
+                }
+            }
+
+            // Dibujar un texto
+            if (type.equals("text")) {
+                String xStr = shape.getProperty("x");
+                String yStr = shape.getProperty("y");
+                String content = shape.getProperty("content");
+                String fill = shape.getProperty("fill");
+                String fontSizeStr = shape.getProperty("font-size");
+                String fontFamily = shape.getProperty("font-family");
+
+                if (xStr != null && yStr != null && content != null) {
+                    int x = (int) Double.parseDouble(xStr);
+                    int y = (int) Double.parseDouble(yStr);
+
+                    // Tamaño de fuente
+                    int fontSize = 12; // valor por defecto
+                    if (fontSizeStr != null) {
+                        try {
+                            fontSize = (int) Double.parseDouble(fontSizeStr);
+                        } catch (NumberFormatException e) {
+                            // se queda el valor por defecto
+                        }
+                    }
+
+                    // Familia de fuente
+                    String family = (fontFamily != null) ? fontFamily : "SansSerif";
+
+                    g2d.setFont(new Font(family, Font.PLAIN, fontSize));
+
+                    // Color del texto
+                    if (fill != null) {
+                        try {
+                            fillColor = Color.decode(fill);
+                        } catch (NumberFormatException e) {
+                            fillColor = parseColor(fill, 1.0f);
+                        }
+                        g2d.setColor(fillColor);
+                    } else {
+                        g2d.setColor(Color.BLACK);
+                    }
+
+                    g2d.drawString(content, x, y);
+                }
+            }
+
         }
     }
 

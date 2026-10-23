@@ -16,6 +16,8 @@ public class TagsHandler extends DefaultHandler {
 
     private ArrayList<Properties> shapes;
     private Properties currentShape = null;
+    private boolean insideText = false;
+    private StringBuilder textContent = new StringBuilder();
 
     public TagsHandler() {
         super();
@@ -98,6 +100,27 @@ public class TagsHandler extends DefaultHandler {
             shapes.add(currentShape);
         }
 
+        if (tagName.equals("ellipse")) {
+            LOG.info("Starting element " + tagName);
+            currentShape = new Properties();
+            currentShape.put("type", "ellipse");
+
+            copyAttributes(atts, currentShape);
+            shapes.add(currentShape);
+        }
+
+        if (tagName.equals("text")) {
+            LOG.info("Starting element " + tagName);
+            currentShape = new Properties();
+            currentShape.put("type", "text");
+
+            copyAttributes(atts, currentShape);
+            shapes.add(currentShape);
+
+            insideText = true;
+            textContent.setLength(0); // limpiar
+        }
+
     }
 
     private void copyAttributes(Attributes atts, Properties myShape) {
@@ -112,12 +135,21 @@ public class TagsHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
+        String tagName = (localName == null || localName.isEmpty()) ? qName.toLowerCase() : localName.toLowerCase();
+
+        if (tagName.equals("text") && currentShape != null) {
+            currentShape.put("content", textContent.toString().trim());
+            insideText = false;
+        }
+
         currentShape = null;
     }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-
+        if (insideText) {
+            textContent.append(ch, start, length);
+        }
     }
 
     @Override

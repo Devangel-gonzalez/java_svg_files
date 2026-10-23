@@ -20,11 +20,11 @@
         },
         {
             "type": "java",
-            "name": "DisplayDiagram - test.svg",
+            "name": "DisplayDiagram - test_shapes.svg",
             "request": "launch",
             "mainClass": "mx.unison.svg.display.DisplayDiagram",
             "projectName": "java_svg_files",
-            "args": "svg/test.svg"
+            "args": "svg/test_shapes.svg"
         },
         {
             "type": "java",

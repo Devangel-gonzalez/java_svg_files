@@ -15,5 +15,23 @@
     fill="yellow"
     stroke="black"
     stroke-width="2"/>
+
+    <ellipse
+    cx="10"
+    cy="150"
+    rx="100"
+    ry="50"
+    fill="lightblue"
+    stroke="navy"
+    stroke-width="3"/>
+
+    <text
+    x="10"
+    y="90"
+    font-family="Arial"
+    font-size="24"
+    fill="black">
+    Programación gráfica con Java
+</text>
     </g>
 </svg>
