@@ -1,3 +1,4 @@
+#  Procesamiento y visualización de archivos SVG con Java
 ## Angel Israel Gonzalez Torres
 
 ## 7. Entregables
@@ -6,7 +7,11 @@
 2. **Archivo SVG de pruebas:** `test_shapes.svg`, que permita verificar las funcionalidades implementadas. ✔️
 3. **Diagrama de clases:** representación de las clases nuevas o modificadas y sus relaciones.
 4. **Evidencias de ejecución:** capturas de pantalla que muestren el funcionamiento de la aplicación y su comparación con un navegador.
-5. **Reporte técnico breve:** explicación de las decisiones de diseño, dificultades encontradas, pruebas realizadas y limitaciones de la solución.
+   Ejecucion
+   <img width="1190" height="975" alt="image" src="https://github.com/user-attachments/assets/de407146-763a-4a73-9690-061abf6130d4" />
+   Navegador
+   <img width="986" height="341" alt="image" src="https://github.com/user-attachments/assets/2df26e4f-6b08-468f-88a2-7910d644c9dd" />
+6. **Reporte técnico breve:** explicación de las decisiones de diseño, dificultades encontradas, pruebas realizadas y limitaciones de la solución.
 
 ## 9. Preguntas de reflexión
 
