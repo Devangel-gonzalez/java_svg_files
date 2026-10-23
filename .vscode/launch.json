@@ -1,0 +1,46 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "java",
+            "name": "DisplayDiagram - simple.svg",
+            "request": "launch",
+            "mainClass": "mx.unison.svg.display.DisplayDiagram",
+            "projectName": "java_svg_files",
+            "args": "svg/simple.svg"
+        },
+        {
+            "type": "java",
+            "name": "DisplayDiagram - figuras.svg",
+            "request": "launch",
+            "mainClass": "mx.unison.svg.display.DisplayDiagram",
+            "projectName": "java_svg_files",
+            "args": "svg/figuras.svg"
+        },
+        {
+            "type": "java",
+            "name": "DisplayDiagram - test.svg",
+            "request": "launch",
+            "mainClass": "mx.unison.svg.display.DisplayDiagram",
+            "projectName": "java_svg_files",
+            "args": "svg/test.svg"
+        },
+        {
+            "type": "java",
+            "name": "DescribeSVG",
+            "request": "launch",
+            "mainClass": "mx.unison.svg.data.DescribeSVG",
+            "projectName": "java_svg_files",
+            "args": "svg/simple.svg"
+        },
+        {
+            "type": "java",
+            "name": "Geometric",
+            "request": "launch",
+            "mainClass": "mx.unison.svg.data.Geometric",
+            "projectName": "java_svg_files",
+            "args": "svg/figuras.svg"
+        }
+    ]
+}

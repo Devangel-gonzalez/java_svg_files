@@ -263,10 +263,77 @@ public class SVGDiagram extends JComponent {
                     g2d.drawPolyline(xPoints, yPoints, n);
                 }
             }
+
+            // Dibujar un recta
+            if (type.equals("rect")) {
+                String xStr = shape.getProperty("x");
+                String yStr = shape.getProperty("y");
+                String widthStr = shape.getProperty("width");
+                String heightStr = shape.getProperty("height");
+                String rxStr = shape.getProperty("rx");
+                String ryStr = shape.getProperty("ry");
+                String fill = shape.getProperty("fill");
+                String stroke = shape.getProperty("stroke");
+                String strokeWidthStr = shape.getProperty("stroke-width");
+
+                if (xStr != null && yStr != null && widthStr != null && heightStr != null) {
+                    int x = (int) Double.parseDouble(xStr);
+                    int y = (int) Double.parseDouble(yStr);
+                    int width = (int) Double.parseDouble(widthStr);
+                    int height = (int) Double.parseDouble(heightStr);
+
+                    // Grosor del trazo
+                    if (strokeWidthStr != null) {
+                        try {
+                            float strokeWidth = Float.parseFloat(strokeWidthStr);
+                            currentStroke = new BasicStroke(strokeWidth);
+                            g2d.setStroke(currentStroke);
+                        } catch (NumberFormatException e) {
+                            currentStroke = new BasicStroke(1.0f);
+                            g2d.setStroke(currentStroke);
+                        }
+                    }
+
+                    // Relleno
+                    if (fill != null && !fill.equalsIgnoreCase("none")) {
+                        try {
+                            fillColor = Color.decode(fill);
+                        } catch (NumberFormatException e) {
+                            fillColor = parseColor(fill, 1.0f);
+                        }
+                        g2d.setColor(fillColor);
+
+                        if (rxStr != null || ryStr != null) {
+                            // Rectángulo con esquinas redondeadas
+                            int rx = rxStr != null ? (int) Double.parseDouble(rxStr) : 0;
+                            int ry = ryStr != null ? (int) Double.parseDouble(ryStr) : rx;
+                            g2d.fillRoundRect(x, y, width, height, rx * 2, ry * 2);
+                        } else {
+                            g2d.fillRect(x, y, width, height);
+                        }
+                    }
+
+                    // Contorno
+                    if (stroke != null) {
+                        try {
+                            strokeColor = Color.decode(stroke);
+                        } catch (NumberFormatException e) {
+                            strokeColor = parseColor(stroke, 1.0f);
+                        }
+                        g2d.setColor(strokeColor);
+                    }
+
+                    if (rxStr != null || ryStr != null) {
+                        int rx = rxStr != null ? (int) Double.parseDouble(rxStr) : 0;
+                        int ry = ryStr != null ? (int) Double.parseDouble(ryStr) : rx;
+                        g2d.drawRoundRect(x, y, width, height, rx * 2, ry * 2);
+                    } else {
+                        g2d.drawRect(x, y, width, height);
+                    }
+                }
+            }
+
         }
-
-        //
-
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/named-color
