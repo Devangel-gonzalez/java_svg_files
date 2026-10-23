@@ -24,7 +24,7 @@ public class SVGDiagram extends JComponent {
     private SAXParser parser = null;
 
     private int svgW; // ancho del dibujo
-    private int svgH;  // alto del dibujo
+    private int svgH; // alto del dibujo
 
     private Properties webColors;
 
@@ -42,7 +42,6 @@ public class SVGDiagram extends JComponent {
         return new Dimension(svgW, svgH);
     }
 
-
     public SVGDiagram(File file) {
         super();
         SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -56,11 +55,13 @@ public class SVGDiagram extends JComponent {
         }
         try {
             // Parsear el archivo SVG usando un manejador de eventos anónimo
-            // Este manejador solo captura el elemento <svg> para obtener sus atributos de ancho y alto
+            // Este manejador solo captura el elemento <svg> para obtener sus atributos de
+            // ancho y alto
             LOG.info("Parsing SVG file: " + file.getAbsolutePath());
             parser.parse(file, new DefaultHandler() {
                 @Override
-                public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+                public void startElement(String uri, String localName, String qName, Attributes attributes)
+                        throws SAXException {
                     if (localName.equals("svg")) {
                         String width = attributes.getValue("width");
                         String height = attributes.getValue("height");
@@ -100,11 +101,13 @@ public class SVGDiagram extends JComponent {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(strokeColor);
 
+        // Dibujar las figuras leidas del archivo SVG
         for (Properties shape : shapes) {
             String type = shape.getProperty("type");
 
             if (type == null)
                 continue;
+            // Dibujar una línea
             if (type.equals("line")) {
                 String x1Str = shape.getProperty("x1");
                 String y1Str = shape.getProperty("y1");
@@ -138,8 +141,8 @@ public class SVGDiagram extends JComponent {
                             strokeColor = Color.decode(stroke);
                         } catch (NumberFormatException e) {
                             LOG.warning("Invalid stroke color: " + stroke);
-                            //strokeColor = parseColor(stroke);
-                            g2d.setColor( parseColor(stroke, 1.0f) );
+                            // strokeColor = parseColor(stroke);
+                            g2d.setColor(parseColor(stroke, 1.0f));
                         }
                         g2d.setColor(strokeColor);
                     } else {
@@ -147,8 +150,9 @@ public class SVGDiagram extends JComponent {
                     }
                     g2d.drawLine(x1, y1, x2, y2);
                 }
-
             }
+
+            // Dibujar un círculo
             if (type.equals("circle")) {
                 String cx = shape.getProperty("cx");
                 String cy = shape.getProperty("cy");
@@ -167,11 +171,10 @@ public class SVGDiagram extends JComponent {
                             fillColor = Color.decode(fill);
                         } catch (NumberFormatException e) {
                             LOG.warning("Invalid stroke color: " + fill);
-                            fillColor = parseColor(fill,1.0f);
+                            fillColor = parseColor(fill, 1.0f);
                         }
                         g2d.setColor(fillColor);
-                        g2d.fillOval(centroX - radius, centroY - radius
-                                , radius * 2, radius * 2);
+                        g2d.fillOval(centroX - radius, centroY - radius, radius * 2, radius * 2);
                     }
                     if (stroke != null) {
                         strokeColor = null;
@@ -201,11 +204,68 @@ public class SVGDiagram extends JComponent {
                     g2d.drawOval(centroX - radius,
                             centroY - radius,
                             radius * 2, radius * 2);
-
                 }
             }
 
+            // Dibujar un polígono (polyline)
+            if (type.equals("polyline")) {
+                String pointsStr = shape.getProperty("points");
+                String stroke = shape.getProperty("stroke");
+                String fill = shape.getProperty("fill");
+                String strokeWidthStr = shape.getProperty("stroke-width");
+
+                if (pointsStr != null) {
+                    // Separar los puntos: "50,50 100,100 150,50"
+                    String[] pairs = pointsStr.trim().split("\\s+");
+                    int n = pairs.length;
+                    int[] xPoints = new int[n];
+                    int[] yPoints = new int[n];
+
+                    for (int i = 0; i < n; i++) {
+                        String[] xy = pairs[i].split(",");
+                        xPoints[i] = (int) Double.parseDouble(xy[0].trim());
+                        yPoints[i] = (int) Double.parseDouble(xy[1].trim());
+                    }
+
+                    // Grosor del trazo
+                    if (strokeWidthStr != null) {
+                        try {
+                            float strokeWidth = Float.parseFloat(strokeWidthStr);
+                            currentStroke = new BasicStroke(strokeWidth);
+                            g2d.setStroke(currentStroke);
+                        } catch (NumberFormatException e) {
+                            currentStroke = new BasicStroke(1.0f);
+                            g2d.setStroke(currentStroke);
+                        }
+                    }
+
+                    // Relleno (si no es "none")
+                    if (fill != null && !fill.equalsIgnoreCase("none")) {
+                        try {
+                            fillColor = Color.decode(fill);
+                        } catch (NumberFormatException e) {
+                            fillColor = parseColor(fill, 1.0f);
+                        }
+                        g2d.setColor(fillColor);
+                        g2d.fillPolygon(xPoints, yPoints, n);
+                    }
+
+                    // Contorno
+                    if (stroke != null) {
+                        try {
+                            strokeColor = Color.decode(stroke);
+                        } catch (NumberFormatException e) {
+                            strokeColor = parseColor(stroke, 1.0f);
+                        }
+                        g2d.setColor(strokeColor);
+                    }
+
+                    g2d.drawPolyline(xPoints, yPoints, n);
+                }
+            }
         }
+
+        //
 
     }
 
@@ -216,18 +276,19 @@ public class SVGDiagram extends JComponent {
             FileReader reader = new FileReader(userDir + "/colors.properties");
             webColors = new Properties();
             webColors.load(reader);
-            //System.out.println(webColors.size() + " " + webColors.getProperty("maroon"));
+            // System.out.println(webColors.size() + " " + webColors.getProperty("maroon"));
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
     }
 
-    // Metodo para parsear un color desde un string, considerando el formato hexadecimal, rgb o nombre de color
+    // Metodo para parsear un color desde un string, considerando el formato
+    // hexadecimal, rgb o nombre de color
     private Color parseColor(String colorString, float opacity) {
         String colorCode = colorString.toLowerCase();
         Color newColor = null;
 
-        //System.out.println("param " + colorCode);
+        // System.out.println("param " + colorCode);
         if (colorCode.startsWith("#")) {
             // Codigo de color "#00ffff"
             colorCode = colorCode.substring(1);
@@ -242,7 +303,7 @@ public class SVGDiagram extends JComponent {
             }
         } else {
             // nombre de color e.g. "red
-            //Color namedColor = Color.getColor(colorString);
+            // Color namedColor = Color.getColor(colorString);
             colorCode = webColors.getProperty(colorCode).substring(1).trim();
         }
         try {
@@ -253,23 +314,21 @@ public class SVGDiagram extends JComponent {
             int len = colorCode.length();
 
             if (len == 6) {
-                //System.out.println(colorCode);
+                // System.out.println(colorCode);
                 r = Integer.parseInt(colorCode.substring(0, 2), 16);
                 g = Integer.parseInt(colorCode.substring(2, 4), 16);
                 b = Integer.parseInt(colorCode.substring(4, 6), 16);
-                //System.out.println(r + "," + g + "," + b);
-              // newColor = new Color(r, g, b, opacity);
+                // System.out.println(r + "," + g + "," + b);
+                // newColor = new Color(r, g, b, opacity);
                 newColor = new Color(r, g, b);
             }
 
         } catch (NumberFormatException nfe) {
-           LOG.warning("Invalid color format: " + nfe.getMessage() );
-           newColor = Color.BLACK;
+            LOG.warning("Invalid color format: " + nfe.getMessage());
+            newColor = Color.BLACK;
         }
         return newColor;
     }
-
-
 
     private Color parseColor(String colorStr) {
         Color color = null;

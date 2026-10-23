@@ -11,8 +11,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TagsHandler  extends DefaultHandler {
-    public static final Logger LOG = Logger.getLogger( TagsHandler.class.getName() );
+public class TagsHandler extends DefaultHandler {
+    public static final Logger LOG = Logger.getLogger(TagsHandler.class.getName());
 
     private ArrayList<Properties> shapes;
     private Properties currentShape = null;
@@ -43,7 +43,7 @@ public class TagsHandler  extends DefaultHandler {
 
     @Override
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-            super.startPrefixMapping(prefix, uri);
+        super.startPrefixMapping(prefix, uri);
     }
 
     @Override
@@ -55,13 +55,14 @@ public class TagsHandler  extends DefaultHandler {
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
         String tagName = null;
 
-        if(localName == null || localName.isEmpty()) {
+        if (localName == null || localName.isEmpty()) {
             tagName = qName.toLowerCase();
         } else {
             tagName = localName.toLowerCase();
         }
 
-        if  (tagName.equals("line") ) {
+        // Elementos SVG
+        if (tagName.equals("line")) {
             LOG.info("Starting element " + tagName);
             currentShape = new Properties();
             currentShape.put("type", "line");
@@ -70,7 +71,7 @@ public class TagsHandler  extends DefaultHandler {
             shapes.add(currentShape);
         }
 
-        if  (tagName.equals("circle") ) {
+        if (tagName.equals("circle")) {
             LOG.info("Starting element " + tagName);
             currentShape = new Properties();
             currentShape.put("type", "circle");
@@ -79,11 +80,20 @@ public class TagsHandler  extends DefaultHandler {
             shapes.add(currentShape);
         }
 
+        if (tagName.equals("polyline")) {
+            LOG.info("Starting element " + tagName);
+            currentShape = new Properties();
+            currentShape.put("type", "polyline");
+
+            copyAttributes(atts, currentShape);
+            shapes.add(currentShape);
+        }
+
     }
 
     private void copyAttributes(Attributes atts, Properties myShape) {
-        if(atts.getLength() != 0) {
-            for(int i = 0; i < atts.getLength(); i++) {
+        if (atts.getLength() != 0) {
+            for (int i = 0; i < atts.getLength(); i++) {
                 String name = atts.getLocalName(i);
                 String value = atts.getValue(i);
                 myShape.put(name, value);

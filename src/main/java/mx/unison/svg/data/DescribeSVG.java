@@ -27,7 +27,7 @@ public class DescribeSVG {
             // Crear un parser SAX
             parser = factory.newSAXParser();
         } catch (Exception e) {
-            logger.severe("Error creating SAX parser: " +e.getMessage());
+            logger.severe("Error creating SAX parser: " + e.getMessage());
             System.exit(1);
         }
 
@@ -35,11 +35,11 @@ public class DescribeSVG {
         SVGDocumentHandler handler = new SVGDocumentHandler();
 
         try {
-            //  Parsear el archivo SVG usando el manejador de eventos
+            // Parsear el archivo SVG usando el manejador de eventos
             System.out.println("Parsing...");
             parser.parse(svgFilePath, handler);
         } catch (Exception e) {
-            logger.severe("Error parsing SVG file: " +e.getMessage());
+            logger.severe("Error parsing SVG file: " + e.getMessage());
             System.exit(2);
         }
     }

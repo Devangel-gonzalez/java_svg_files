@@ -14,10 +14,9 @@ public class DisplayDiagram {
 
         File file = new File(args[0]);
 
-        Path path = Path.of( args[0] );
+        Path path = Path.of(args[0]);
         path = path.toAbsolutePath();
         System.out.println(path.toString());
-
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
